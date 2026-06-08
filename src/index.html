@@ -9,6 +9,11 @@
 </head>
 <body>
   <app-root></app-root>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCm95fsBDxttsIEN2a9Q2ysUv6bToufaqc&libraries=geometry"></script>
+  <script>
+    window.initMap = function() {
+      window.dispatchEvent(new Event('google-map-ready'));
+    };
+  </script>
+  <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCm95fsBDxttsIEN2a9Q2ysUv6bToufaqc&libraries=geometry&callback=initMap"></script>
 </body>
 </html>

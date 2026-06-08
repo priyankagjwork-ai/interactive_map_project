@@ -1,23 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { GoogleMapsModule } from '@angular/google-maps';
+import { GoogleMapsModule, GoogleMap } from '@angular/google-maps';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { AddressService } from './address.service';
+import { SiteHeaderComponent } from './site-header.component';
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-root', 
   standalone: true,
-  imports: [RouterOutlet, CommonModule, ReactiveFormsModule, GoogleMapsModule, HttpClientModule, FormsModule],
+  imports: [RouterOutlet, CommonModule, ReactiveFormsModule, GoogleMapsModule, HttpClientModule, FormsModule, SiteHeaderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
+  @ViewChild(GoogleMap) map?: GoogleMap;
+
   addressForm!: FormGroup;
-  center: google.maps.LatLngLiteral = { lat: 40.7128, lng: -74.0060 };
-  zoom = 10;
+  center: google.maps.LatLngLiteral = { lat: 39.8283, lng: -98.5795 }; // Center of USA
+  zoom = 3; // Show entire USA more clearly on initial load
   savedAddresses: string[] = [];
   filteredAddresses: string[] = [];
   markerOptions: google.maps.MarkerOptions = { draggable: false };
@@ -25,6 +28,7 @@ export class AppComponent implements OnInit {
   markers: google.maps.LatLngLiteral[] = [];
   editingAddress: string | null = null;
   selectedStateFilter: string = '';
+  mapLoaded = false;
 
   states = [
     { code: '', name: 'All States' },
@@ -109,6 +113,18 @@ export class AppComponent implements OnInit {
     }
     
     this.filteredAddresses = [...this.savedAddresses];
+  }
+
+  ngAfterViewInit() {
+    if ((window as any).google?.maps) {
+      this.initializeMap();
+    } else {
+      window.addEventListener('google-map-ready', () => this.initializeMap(), { once: true });
+    }
+  }
+
+  private initializeMap() {
+    this.mapLoaded = true;
     this.loadAllMarkers();
   }
 
@@ -160,6 +176,7 @@ export class AppComponent implements OnInit {
       this.addressService.deleteAddress(address);
       this.savedAddresses = this.addressService.getAddresses();
       this.applyStateFilter();
+      this.markerPosition = null;
     }
   }
 
@@ -176,7 +193,30 @@ export class AppComponent implements OnInit {
         return parts && parts[1] === this.selectedStateFilter;
       });
     }
-    this.loadAllMarkers();
+  }
+
+  private geocodeAndUpdateMap(address: string) {
+    const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+
+    this.http.get<any[]>(nominatimUrl).subscribe({
+      next: (results) => {
+        if (results && results.length > 0) {
+          this.center = {
+            lat: parseFloat(results[0].lat),
+            lng: parseFloat(results[0].lon)
+          };
+          this.markerPosition = { ...this.center };
+          this.zoom = 15;
+        } else {
+          alert('Address not found: ' + address);
+          this.markerPosition = null;
+        }
+      },
+      error: (error) => {
+        alert('Geocoding error: ' + error.message);
+        this.markerPosition = null;
+      }
+    });
   }
 
   private loadAllMarkers() {
@@ -220,16 +260,35 @@ export class AppComponent implements OnInit {
 
   private adjustMapBounds() {
     if (this.markers.length === 0) {
+      // No markers: focus on North Carolina by default
+      // NC approximate bounds: SW lat/lng and NE lat/lng
+      const ncSW: google.maps.LatLngLiteral = { lat: 33.8361, lng: -84.3219 };
+      const ncNE: google.maps.LatLngLiteral = { lat: 36.5881, lng: -75.4605 };
+      if (this.map && this.map.googleMap) {
+        const bounds = new google.maps.LatLngBounds(ncSW as any, ncNE as any);
+        this.map.fitBounds(bounds);
+      } else {
+        // Fallback center/zoom for NC
+        this.center = { lat: 35.5, lng: -79.0 };
+        this.zoom = 6;
+      }
+      return;
+    }
+
+    if (this.map && this.markers.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      this.markers.forEach(marker => bounds.extend(marker));
+      this.map.fitBounds(bounds);
       return;
     }
 
     if (this.markers.length === 1) {
       this.center = this.markers[0];
-      this.zoom = 15;
+      this.zoom = 8;
       return;
     }
 
-    // Calculate bounds for multiple markers
+    // Fallback bounds for multiple markers when the map instance is not ready
     let minLat = this.markers[0].lat;
     let maxLat = this.markers[0].lat;
     let minLng = this.markers[0].lng;
@@ -261,31 +320,11 @@ export class AppComponent implements OnInit {
     } else if (maxDiff < 5) {
       this.zoom = 8;
     } else {
-      this.zoom = 6;
+      this.zoom = 5;
     }
   }
 
-  private geocodeAndUpdateMap(address: string) {
-    const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
-
-    this.http.get<any[]>(nominatimUrl).subscribe({
-      next: (results) => {
-        if (results && results.length > 0) {
-          this.center = {
-            lat: parseFloat(results[0].lat),
-            lng: parseFloat(results[0].lon)
-          };
-          this.markerPosition = { ...this.center };
-          this.zoom = 15;
-        } else {
-          alert('Address not found: ' + address);
-          this.markerPosition = null;
-        }
-      },
-      error: (error) => {
-        alert('Geocoding error: ' + error.message);
-        this.markerPosition = null;
-      }
-    });
+  trackByMarker(index: number, marker: google.maps.LatLngLiteral): string {
+    return `${marker.lat}-${marker.lng}`;
   }
 }

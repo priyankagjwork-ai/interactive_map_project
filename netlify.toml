@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build -- --configuration production"
+  publish = "dist/interactive-map-project"
+
+[build.environment]
+  NODE_VERSION = "24.13.1"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,24 @@
+<div class="site-header">
+  <div class="header-content" *ngIf="!editing">
+    <div class="header-left">
+      <h1>{{ title }}</h1>
+      <p class="summary">{{ summary }}</p>
+    </div>
+    <div class="header-actions">
+      <button class="edit" (click)="startEdit()">Edit Header</button>
+    </div>
+  </div>
+
+  <div class="header-edit" *ngIf="editing">
+    <label>Title
+      <input [(ngModel)]="title" />
+    </label>
+    <label>Summary
+      <textarea rows="3" [(ngModel)]="summary"></textarea>
+    </label>
+    <div class="actions">
+      <button class="save" (click)="save()">Save</button>
+      <button class="cancel" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+</div>
