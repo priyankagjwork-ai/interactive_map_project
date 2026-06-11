@@ -7,6 +7,9 @@ An Angular application that allows users to enter an address in a form and view 
 - Address input form
 - Google Maps integration with geocoding
 - Responsive layout with form on the left and map on the right
+- **Shared data storage via GitHub** - All users see each other's edits in real-time
+- Admin interface for data management
+- Nonprofit-friendly free storage solution
 
 ## Prerequisites
 
@@ -21,6 +24,24 @@ An Angular application that allows users to enter an address in a form and view 
 4. Replace `YOUR_API_KEY` in `src/index.html` with your actual API key
 5. Run `ng serve` to start the development server
 6. Navigate to `http://localhost:4200/`
+
+## Shared Data Storage (GitHub Sync)
+
+To enable real-time data synchronization across all users:
+
+1. Follow the setup guide in [GITHUB_SETUP.md](GITHUB_SETUP.md)
+2. Enter your GitHub credentials in Admin Mode
+3. All edits will now be saved to a shared GitHub repository
+4. All users see each other's changes immediately
+
+**Benefits:**
+- ✅ 100% free (no credits needed)
+- ✅ Works for nonprofits
+- ✅ Professional-grade security
+- ✅ All users see the same data
+- ✅ Complete edit history
+
+For detailed instructions, see [GITHUB_SETUP.md](GITHUB_SETUP.md)
 
 ## Development server
 

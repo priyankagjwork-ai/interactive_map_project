@@ -1,0 +1,141 @@
+<div class="container">
+  <div class="form-section">
+    <div *ngIf="!isAuthenticated" class="login-overlay" style="position: static; background: transparent; box-shadow: none;">
+      <div class="login-prompt" style="max-width: 100%;">
+        <h3>Admin Access Required</h3>
+        <p>Enter the admin password to access the data entry and edit page.</p>
+        <button (click)="promptForPassword()" class="unlock-btn">Unlock Admin Mode</button>
+        <p class="hint-text">If you are authorized, enter the password to manage locations.</p>
+      </div>
+    </div>
+
+    <div *ngIf="isAuthenticated">
+      <div class="auth-status">
+        <div class="auth-badge">✓ Admin Mode</div>
+        <button (click)="logout()" class="logout-btn">Logout</button>
+      </div>
+
+      <app-github-config></app-github-config>
+
+      <div class="filter-section">
+        <h2>Address Management</h2>
+        <h3>Filter Addresses by State</h3>
+        <select [(ngModel)]="selectedStateFilter" (change)="onStateFilterChange()">
+          <option *ngFor="let state of states" [value]="state.code">{{state.name}}</option>
+        </select>
+      </div>
+
+      <div class="saved-addresses">
+        <h3>Saved Locations ({{filteredLocations.length}})</h3>
+        <ul>
+          <li *ngFor="let location of filteredLocations" class="address-item">
+            <div class="location-info">
+              <strong>{{location.organizationName}}</strong>
+              <div class="details">{{location.organizationDetails}}</div>
+              <div class="address">
+                <span *ngIf="location.street">{{location.street}}, </span>{{location.city}}, {{location.state}}<span *ngIf="location.zip"> {{location.zip}}</span>
+              </div>
+              <div class="contact-info">
+                <span *ngIf="location.website" class="website"><a href="https://{{location.website}}" target="_blank">{{location.website}}</a></span>
+                <span *ngIf="location.email" class="email"><a href="mailto:{{location.email}}">{{location.email}}</a></span>
+              </div>
+            </div>
+            <div class="actions">
+              <button (click)="editAddress(location, $event)" class="edit-btn">Edit</button>
+              <button (click)="deleteAddress(location, $event)" class="delete-btn">Delete</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="address-form-section">
+        <h3>Add/Edit Location</h3>
+        <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="orgName">Organization Name:</label>
+            <input type="text" id="orgName" formControlName="organizationName" required>
+            <div class="error" *ngIf="addressForm.get('organizationName')?.invalid && addressForm.get('organizationName')?.touched">
+              Organization name is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="orgDetails">Organization Details:</label>
+            <input type="text" id="orgDetails" formControlName="organizationDetails" placeholder="e.g., Non-profit, Department, Division">
+            <div class="info-text">Optional - Brief description or category</div>
+          </div>
+
+          <div class="form-group">
+            <label for="street">Street Address:</label>
+            <input type="text" id="street" formControlName="street" placeholder="Optional - leave blank for safe house or no physical address">
+            <div class="info-text">Optional - Organizations can be located by city only</div>
+          </div>
+
+          <div class="form-group">
+            <label for="city">City:</label>
+            <input type="text" id="city" formControlName="city" required>
+            <div class="error" *ngIf="addressForm.get('city')?.invalid && addressForm.get('city')?.touched">
+              City is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="state">State:</label>
+            <select id="state" formControlName="state" required>
+              <option value="">Select State</option>
+              <option *ngFor="let state of states.slice(1)" [value]="state.code">{{state.name}}</option>
+            </select>
+            <div class="error" *ngIf="addressForm.get('state')?.invalid && addressForm.get('state')?.touched">
+              State is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="zip">ZIP Code:</label>
+            <input type="text" id="zip" formControlName="zip" placeholder="Optional">
+            <div class="error" *ngIf="addressForm.get('zip')?.invalid && addressForm.get('zip')?.touched">
+              ZIP code must be in format 12345 or 12345-6789
+            </div>
+            <div class="info-text" *ngIf="!addressForm.get('zip')?.invalid">Optional - For more precise location</div>
+          </div>
+
+          <div class="form-group">
+            <label for="website">Website:</label>
+            <input type="text" id="website" formControlName="website" placeholder="e.g., www.example.com">
+            <div class="info-text">Optional - Organization website</div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" formControlName="email" placeholder="e.g., contact@example.com">
+            <div class="error" *ngIf="addressForm.get('email')?.invalid && addressForm.get('email')?.touched">
+              Please enter a valid email address
+            </div>
+            <div class="info-text" *ngIf="!addressForm.get('email')?.invalid">Optional - Contact email</div>
+          </div>
+
+          <div class="form-buttons">
+            <button type="submit" class="submit-btn" [disabled]="!addressForm.valid">
+              {{ editingLocationId ? 'Update Location' : 'Save Location' }}
+            </button>
+            <button type="button" class="cancel-btn" *ngIf="editingLocationId" (click)="editingLocationId = null; addressForm.reset()">Cancel Edit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="map-section">
+    <google-map
+      [center]="center"
+      [zoom]="zoom"
+      width="100%"
+      height="100%">
+      <map-marker
+        *ngFor="let marker of markers; trackBy: trackByMarker"
+        [position]="marker.position"
+        [options]="getMarkerOptions(marker.id)">
+      </map-marker>
+    </google-map>
+  </div>
+</div>
