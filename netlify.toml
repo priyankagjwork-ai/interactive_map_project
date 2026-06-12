@@ -3,7 +3,7 @@
   publish = "dist/interactive-map-project"
 
 [build.environment]
-  NODE_VERSION = "24.13.1"
+  NODE_VERSION = "26"
 
 [[redirects]]
   from = "/*"
