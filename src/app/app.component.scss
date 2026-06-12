@@ -3,7 +3,7 @@
 .container {
   display: flex;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #668aa9 0%, #668aa9 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
 
@@ -78,7 +78,7 @@
 
     .map-panel-header p {
       margin: 8px 0 0;
-      color: #5f6d7a;
+      color: #4e6478;
       font-size: 14px;
       line-height: 1.6;
     }
@@ -105,7 +105,6 @@
 .form-section {
   flex: 0 0 420px;
   padding: 30px;
-  background: #fff;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   overflow-y: auto;
   border-right: 1px solid #e1e5e9;
@@ -171,7 +170,6 @@
 .map-section {
   flex: 1;
   padding: 20px;
-  background: #f8f9fa;
   overflow: hidden;
   position: relative;
 
@@ -228,7 +226,7 @@
 }
 
 .unlock-btn {
-  background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  background: linear-gradient(135deg,#668aa9 0%,#668aa9 100%);
   color: #fff;
   border: none;
   padding: 12px 28px;
@@ -261,7 +259,7 @@ h2 {
     transform: translateX(-50%);
     width: 60px;
     height: 3px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: linear-gradient(90deg, #668aa9, #668aa9);
     border-radius: 2px;
   }
 }
@@ -312,7 +310,7 @@ input, select {
 
   &:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #668aa9;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     background: #ffffff;
   }
@@ -387,7 +385,7 @@ button {
 
 .submit-btn {
   flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #668aa9 0%, #668aa9 100%);
   color: white;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 
@@ -482,7 +480,7 @@ ul {
 
   &:hover {
     background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-    border-color: #667eea;
+    border-color: #668aa9;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.15);
   }
@@ -534,13 +532,13 @@ ul {
       display: block;
 
       a {
-        color: #667eea;
+        color: #668aa9;
         text-decoration: none;
         transition: color 0.2s ease;
         word-break: break-all;
 
         &:hover {
-          color: #764ba2;
+          color: #668aa9;
           text-decoration: underline;
         }
       }
@@ -632,7 +630,7 @@ ul {
       transform: translateX(-50%);
       width: 40px;
       height: 2px;
-      background: linear-gradient(90deg, #667eea, #764ba2);
+      background: linear-gradient(90deg, #668aa9, #668aa9);
       border-radius: 1px;
     }
   }
