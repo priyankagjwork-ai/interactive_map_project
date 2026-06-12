@@ -1,0 +1,55 @@
+<div class="container public-view">
+  <div class="form-section public-readonly-panel">
+    <div class="public-view-header">
+      <div class="public-view-intro">
+        <h2>Browse Available Locations</h2>
+        <p>Filter by state and view the current location list in read-only mode.</p>
+      </div>
+      <button type="button" class="admin-link-btn" (click)="goToAdmin()">Admin access</button>
+    </div>
+
+    <div class="filter-section">
+      <h3>Filter Addresses by State</h3>
+      <select [(ngModel)]="selectedStateFilter" (change)="onStateFilterChange()">
+        <option *ngFor="let state of states" [value]="state.code">{{state.name}}</option>
+      </select>
+    </div>
+
+    <div class="saved-addresses">
+      <h3>Saved Locations ({{filteredLocations.length}})</h3>
+      <ul>
+        <li *ngFor="let location of filteredLocations" class="address-item" [class.selected]="location.id === selectedLocationId" (click)="selectAddress(location)">
+          <div class="location-info">
+            <strong>{{location.organizationName}}</strong>
+            <div class="details">{{location.organizationDetails}}</div>
+            <div class="address">
+              <span *ngIf="location.street">{{location.street}}, </span>{{location.city}}, {{location.state}}<span *ngIf="location.zip"> {{location.zip}}</span>
+            </div>
+            <div class="contact-info">
+              <span *ngIf="location.website" class="website"><a href="https://{{location.website}}" target="_blank">{{location.website}}</a></span>
+              <span *ngIf="location.email" class="email"><a href="mailto:{{location.email}}">{{location.email}}</a></span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="map-section public-map-section">
+    <div class="map-panel-header">
+      <h3>Live Map</h3>
+      <p>Location markers are visible for all saved entries.</p>
+    </div>
+    <google-map
+      [center]="center"
+      [zoom]="zoom"
+      width="100%"
+      height="100%">
+      <map-marker
+        *ngFor="let marker of markers; trackBy: trackByMarker"
+        [position]="marker.position"
+        [options]="getMarkerOptions(marker.id)">
+      </map-marker>
+    </google-map>
+  </div>
+</div>
